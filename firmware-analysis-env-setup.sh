@@ -1,4 +1,8 @@
 #!/bin/bash
+
+dhclient
+sleep 5
+
 rm -rf ./binwalk
 git clone https://github.com/devttys0/binwalk.git
 cd binwalk
@@ -59,8 +63,8 @@ echo " "
 echo "***********************************"
 echo -e "\e[31m(3)\e[0m"
 echo "***********************************"
-echo "Change BINWALK part in 'shared-ng.inc' located in \"fmk\" directory"
-echo "to the value of \"`which binwalk`\""
+echo "The value of BINWALK in 'shared-ng.inc' located in \"fmk\" directory"
+echo "is set to  \"/usr/local/bin/binwwalk\" if it is different from \"`which binwalk`\", go change it to the later"
 echo "***********************************"
 
 echo "done Yay!!! :)"
