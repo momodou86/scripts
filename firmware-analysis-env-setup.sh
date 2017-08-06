@@ -34,6 +34,7 @@ sudo -u postgres psql -c "DROP DATABASE IF EXISTS firmware;"
 sudo -u postgres psql -c "CREATE DATABASE firmware OWNER firmadyne;"
 sudo -u postgres psql -c "CREATE USER firmadyne WITH PASSWORD 'firmadyne';"
 sudo -u postgres psql -d firmware < ./fat/database/schema
+sudo systemctl start postgresql
 
 
 sudo apt-get install git build-essential zlib1g-dev liblzma-dev python-magic -y
@@ -46,6 +47,8 @@ mv firmware-mod-kit fmk
 
 rm -rf firmwalker
 git clone https://github.com/craigz28/firmwalker.git
+
+sudo systemctl status postgresql
 
 echo " "
 echo -e "\e[101mPLEASE READ AND MAKE THESE CHANGES BELOW\e[0m"
