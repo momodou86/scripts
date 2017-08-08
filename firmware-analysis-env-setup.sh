@@ -1,5 +1,9 @@
 #!/bin/bash
 
+#Author: Momodou Jaiteh
+
+
+apt-get install sudo dhclient
 dhclient
 sleep 5
 
@@ -22,7 +26,7 @@ mv ./firmadyne fat
 cd ./fat; ./download.sh 
 
 rm -rf ./firmware-analysis-toolkit
-git clone https://github.com/attify/firmware-analysis-toolkit
+git clone https://github.com/momodou86/firmware-analysis-toolkit
 mv firmware-analysis-toolkit/fat.py .
 mv firmware-analysis-toolkit/reset.sh .
 chmod +x fat.py 
