@@ -3,7 +3,7 @@
 #Author: Momodou Jaiteh
 
 
-apt-get install sudo dhclient
+apt-get install sudo 
 
 rm -rf ./binwalk
 git clone https://github.com/devttys0/binwalk.git
