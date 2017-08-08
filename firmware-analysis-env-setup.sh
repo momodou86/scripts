@@ -34,12 +34,11 @@ chmod +x reset.sh
 cd ..
 
 sudo apt-get install postgresql
+sudo systemctl start postgresql
 sudo -u postgres psql -c "DROP DATABASE IF EXISTS firmware;"
 sudo -u postgres psql -c "CREATE DATABASE firmware OWNER firmadyne;"
 sudo -u postgres psql -c "CREATE USER firmadyne WITH PASSWORD 'firmadyne';"
 sudo -u postgres psql -d firmware < ./fat/database/schema
-sudo systemctl start postgresql
-
 
 sudo apt-get install git build-essential zlib1g-dev liblzma-dev python-magic -y
 
