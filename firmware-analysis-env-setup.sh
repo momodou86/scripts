@@ -4,8 +4,6 @@
 
 
 apt-get install sudo dhclient
-dhclient
-sleep 5
 
 rm -rf ./binwalk
 git clone https://github.com/devttys0/binwalk.git
