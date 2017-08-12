@@ -2,6 +2,12 @@
 
 #Author: Momodou Jaiteh
 
+# this is to ensure that all dependencies will be installed.
+grep 'deb http://ftp.de.debian.org/debian wheezy main' /etc/apt/sources.list > /tmp/test123 
+if [ ! -s /tmp/test123 ]; then
+  echo 'deb http://ftp.de.debian.org/debian wheezy main' >> /etc/apt/sources.list 
+fi
+apt update
 
 apt-get install sudo 
 
@@ -62,7 +68,6 @@ sed -i "10s,.*,$binwalk_path," ./fat/fat.py
 
 BINWALK=BINWALK=\'`which binwalk`\'
 sed -i "11s,.*,$BINWALK," ./fmk/shared-ng.inc
-
 
 echo "done Yay!!! :)"
 echo " "
