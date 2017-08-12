@@ -2,6 +2,7 @@
 
 #Author: Momodou Jaiteh
 
+
 # this is to ensure that all dependencies will be installed.
 grep 'deb http://ftp.de.debian.org/debian wheezy main' /etc/apt/sources.list > /tmp/test123 
 if [ ! -s /tmp/test123 ]; then
@@ -10,6 +11,8 @@ fi
 apt update
 
 apt-get install sudo 
+
+wget -o wnap320.zip 'http://www.downloads.netgear.com/files/GDC/WNAP320/WNAP320%20Firmware%20Version%202.0.3.zip'
 
 rm -rf ./binwalk
 git clone https://github.com/devttys0/binwalk.git
