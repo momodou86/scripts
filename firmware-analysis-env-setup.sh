@@ -51,25 +51,18 @@ git clone https://github.com/craigz28/firmwalker.git
 
 sudo systemctl status postgresql
 
-echo " "
-echo -e "\e[101mPLEASE READ AND MAKE THESE CHANGES BELOW\e[0m"
-echo " "
-echo -e "\e[31m(1)\e[0m"
-echo "***********************************"
-echo "Edit the firmadyne.config file in \"fat\" directory and change the value of" 
-echo "FIRMWARE_DIR to be \"`pwd`/fat/\" and uncomment it - i.e remove the \# symbol "
-echo " "
-echo -e "\e[31m(2)\e[0m"
-echo "************************************"
-echo "Edit line number 9 in the fat.py file located in the fat folder to" 
-echo "firmadyne_path =\"`pwd`/fat\""
-echo " "
-echo "***********************************"
-echo -e "\e[31m(3)\e[0m"
-echo "***********************************"
-echo "The value of BINWALK in 'shared-ng.inc' located in \"fmk\" directory"
-echo "is set to  \"/usr/local/bin/binwwalk\" if it is different from \"`which binwalk`\", go change it to the later"
-echo "***********************************"
+FAT=FIRMWARE_DIR=\'`pwd`/fat/\'
+sed -i "4s,.*,$FAT," ./fat/firmadyne.config
+
+FIRMPATH=firmadyne_path=\'`pwd`/fat\'
+sed -i "9s,.*,$FIRMPATH," ./fat/fat.py
+
+binwalk_path=binwalk_path=\'`which binwalk`\'
+sed -i "10s,.*,$binwalk_path," ./fat/fat.py
+
+BINWALK=BINWALK=\'`which binwalk`\'
+sed -i "11s,.*,$BINWALK," ./fmk/shared-ng.inc
+
 
 echo "done Yay!!! :)"
 echo " "
