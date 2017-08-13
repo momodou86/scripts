@@ -12,7 +12,7 @@ apt update
 
 apt-get install sudo 
 
-wget -o wnap320.zip 'http://www.downloads.netgear.com/files/GDC/WNAP320/WNAP320%20Firmware%20Version%202.0.3.zip'
+wget -O wnap320.zip 'http://www.downloads.netgear.com/files/GDC/WNAP320/WNAP320%20Firmware%20Version%202.0.3.zip'
 
 rm -rf ./binwalk
 git clone https://github.com/devttys0/binwalk.git
