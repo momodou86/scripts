@@ -1,0 +1,191 @@
+#!/bin/bash
+
+# Author : Momodou L Jaiteh
+# No warranties - Use at your own risk. 
+# May delete your existing access keys if used incorrectly.
+
+
+
+
+#Global VARS
+export CURRENT_RC=$HOME/.bashrc
+export SHELL=/bin/bash
+export GLOBALTOKEN
+
+export FILENAME=$1
+
+NON="\e[0m"
+BLACK="\e[30m"
+RED="\e[31m"
+GREEN="\e[32m"
+BROWN="\e[33m"
+BLUE="\e[34m"
+PURPLE="\e[35m"
+CRYAN="\e[36m"
+GRAY="\e[37m"
+
+
+
+
+usage() {
+printf '%*s' 50 | tr ' ' '*' && echo
+echo -e "*****$BLUE" Either privide the name of a csv "$NON      *****"
+echo -e "*****$BLUE" file within the script directory."$NON      *****"
+echo "***** Usage: $0 example.csv         *****"
+echo -e "*****$BLUE" OR use the auto argument to follow "$NON    *****"
+echo -e "*****$BLUE" the prompt and paste the access keys."$NON  *****"
+echo "***** Usage: $0 auto                *****"
+printf '%*s' 50 | tr ' ' '*' && echo
+}
+
+auto() {
+
+   echo -e "***** Paste your $BLUE"AWS ACCESS KEY"$NON here and press $BLUE"ENTER"$NON twice*****"
+         while read -r line
+         do
+            token+="${line} "
+            [ -z "$line" ] && break
+         done
+}
+
+csv() {
+      AWS_ACCESS_KEY_ID=$(cat $FILENAME  | grep -v key | cut -d "," -f1)
+      AWS_SECRET_ACCESS_KEY=$(cat $FILENAME  | grep -v key | cut -d "," -f2)
+      token="AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY"
+}
+
+setup() {
+
+   printf '%*s' 50 | tr ' ' '*' && echo
+   echo -e "*****        $BLUE"BEGINING SETUP"$NON                  *****"
+   printf '%*s' 50 | tr ' ' '*' && echo
+
+: <<'END'
+  if [ -z "$FILENAME" ];then
+
+         echo "***** Please paste your token here and press ENTER *****"
+         while read -r line
+         do
+            token+="${line} "
+            [ -z "$line" ] && break
+            
+         done
+   else
+      
+      AWS_ACCESS_KEY_ID=$(cat $FILENAME  | grep -v key | cut -d "," -f1)
+      AWS_SECRET_ACCESS_KEY=$(cat $FILENAME  | grep -v key | cut -d "," -f2)
+      token="AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY"
+
+   fi 
+END
+
+   if [ -z "$token" ]; then
+      echo "***** You did not provide token. Exiting!!! *****"
+      exit 
+   else
+      echo $token >./token_temp
+      sed -i -- "s|export||g" ./token_temp 
+      sed -i -- "s|\"||g" ./token_temp
+      sed -i -- "s|^\[.*\]||g" ./token_temp
+      export GLOBALTOKEN=$(cat ./token_temp)
+   fi   
+
+      
+}
+
+
+awscreds() {
+
+    #if [ -z $profile ]; then
+    echo -e "***** Enter the name of the $BLUE"PROFILE"$NON to use.  *****"
+    read -e profile
+    #fi
+    grep -i $profile $HOME/.aws/credentials >/dev/null 2>&1
+
+    if [ $? -eq 0 ]; then
+       printf '%*s' 50 | tr ' ' '*' && echo
+       echo -e "*****  $RED'WARNING!!!: The profile $profile exist'$NON.*****"
+       echo -e "*****Do you really want to replace it? y or n*****"
+       read -e finalanswer
+
+       if [ $finalanswer = "y" ]; then
+
+           sed -i "/$profile/,+3d" $HOME/.aws/credentials
+           echo "[$profile]"  >>  $HOME/.aws/credentials
+           echo $GLOBALTOKEN | grep -is AWS | cut -d " " -f1  >> $HOME/.aws/credentials
+           echo $GLOBALTOKEN | grep -is AWS | cut -d " " -f2  >> $HOME/.aws/credentials
+           echo $GLOBALTOKEN | grep -is AWS | cut -d " " -f3-  >> $HOME/.aws/credentials
+           echo " " >> $HOME/.aws/credentials
+       else
+         echo "*************You answered no. Exiting*************"
+         exit -1
+      fi
+    else
+       #echo " " >> $HOME/.aws/credentials
+       echo "[$profile]"  >>  $HOME/.aws/credentials
+       echo $GLOBALTOKEN | grep -is AWS | cut -d " " -f1  >> $HOME/.aws/credentials
+       echo $GLOBALTOKEN | grep -is AWS | cut -d " " -f2  >> $HOME/.aws/credentials
+       echo $GLOBALTOKEN | grep -is AWS | cut -d " " -f3-  >> $HOME/.aws/credentials
+       echo " " >> $HOME/.aws/credentials
+    fi
+    
+    sed -i.orginal -- "s|export||g" $HOME/.aws/credentials
+    sed -i.orginal -- "s|\"||g" $HOME/.aws/credentials
+
+    printf '%*s' 45 | tr ' ' '*' && echo
+    echo "***** Please provide the AWS region     *****"
+    echo "*****      Example: us-west-2           *****"
+    read -e region
+    if [ -z "$region" ]
+        then
+        echo -e "***** $RED"No region was provided."$NON           *****"
+        echo "***** Will default to us-west-2         *****"
+        region="us-west-2"
+    fi
+   echo "***** Update k8s configuration?: y or n *****"
+   read -e answer
+   if [ $answer = "y" ]; then
+
+     echo "***** Please provide the AWS K8S cluster name:*****"
+     read  -e clustername
+     if [ -z "$clustername" ]
+         then
+         echo "***** No cluster name provided.               *****"
+         echo -e "***** Kubeconfig $RED"WILL NOT"$NON be updated          *****"
+     else
+         aws eks --region $region update-kubeconfig --name $clustername
+     fi
+   printf '%*s' 51 | tr ' ' '*' && echo
+  fi
+  if [ $? -eq 0 ]; then
+    echo "*********************************************"
+    echo -e "****      $BLUE"HOLD ON TIGHT"$NON                 *****"
+    echo "****Checking validity of your profile!!!*****"
+    echo "*********************************************"
+    aws sts get-caller-identity --profile $profile 
+    echo ""
+    echo "********************************************"
+    echo -e "*****$GREEN"SETUP COMPLETED"$NON*****"
+  else
+     echo ""
+     echo "********************************************"
+     echo -e "*****$RED"HMMMMMMMMM SOMETHING WENT WRONG"$NON******"
+  fi
+}
+
+
+
+if [[ "$*" == *'auto'* ]]
+then
+    auto
+    setup
+    awscreds
+
+elif [[ "$*" == *"csv"* ]]
+   then
+    csv
+    setup
+    awscreds
+else
+   usage
+fi
